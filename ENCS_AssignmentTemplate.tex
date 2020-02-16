@@ -17,13 +17,15 @@
 \usepackage{enumerate}
 \usepackage{geometry}
 \usepackage[export]{adjustbox}
+\usepackage{tikz}
+\usetikzlibrary{calc}
 
 
 \geometry{a4paper, portrait, margin = 1.25in}
 \setlength\parindent{0pt} % Removes all indentation from paragraphs
 
 
-%\usepackage{times} % Uncomment to use the Times New Roman font
+\usepackage{times} 
 
 %----------------------------------------------------------------------------------------
 %	DOCUMENT INFORMATION
@@ -56,6 +58,18 @@
 		\includegraphics[width=0.65\textwidth,scale=1.1]{ENCS.jpg} % Include the image placeholder.png
 	\end{figure}
 	\thispagestyle{empty}
+	\begin{tikzpicture}[overlay,remember picture]
+	\draw [line width=3pt,rounded corners=1pt,]
+	($ (current page.north west) + (1cm,-1cm) $)
+	rectangle
+	($ (current page.south east) + (-1cm,1cm) $);  
+	\end{tikzpicture}
+	\begin{tikzpicture}[overlay,remember picture]
+	\draw [line width=3pt,rounded corners=1pt,]
+	($ (current page.north west) + (1.2cm,-1.2cm) $)
+	rectangle
+	($ (current page.south east) + (-1.2cm,1.2cm) $);  
+	\end{tikzpicture}
 \end{titlepage}
 
 
@@ -76,7 +90,7 @@
 		\item Part a
 	\end{enumerate}
 	
-%	\item Question 2 ----- Uncommnt, Copy and paste this block to add more questions/Parts
+%	\item Question 2 ----- Copy and paste this block to add more questions/Parts
 %	\begin{enumerate}
 %		\item Part a
 %	\end{enumerate}
