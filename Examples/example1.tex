@@ -1,0 +1,262 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Adrian Patterson
+% ENCS Lab Report Template
+% Version 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\usepackage{siunitx} % Provides the \SI{}{} and \si{} command for typesetting SI units
+\usepackage{graphicx} % Required for the inclusion of images
+\usepackage{natbib} % Required to change bibliography style to APA
+\usepackage{amsmath} % Required for some math elements 
+\usepackage{enumerate}
+\usepackage{geometry}
+\usepackage{ulem}
+\usepackage[export]{adjustbox}
+\usepackage{tikz}
+\usepackage{cancel}
+\usetikzlibrary{calc}
+\usepackage{courier}
+
+
+\geometry{a4paper, portrait, margin = 1.25in}
+\newcommand\ddfrac[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+
+\usepackage{times} 
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Assignment 2\\COEN 317} % Title
+\author{Adrian \textsc{Patterson}\\40048841} % Author name
+\date{\today} % Date for the report
+
+\begin{document}
+
+\begin{titlepage}
+	\nointerlineskip  % No skip for prev line
+	\null  % Empty line
+	\vfill
+	\let\snewpage \newpage
+	\let\newpage \relax
+	\maketitle
+	\begin{center}
+		\begin{tabular}{l r}
+			Date Due: & October 9, 2020 \\ % Date the experiment was performed
+			Instructor: & Professor Gomar \\ % Instructor/supervisor
+			Section: & U
+		\end{tabular}
+	\end{center}
+	\let \newpage \snewpage
+	\vspace{2.5in}
+	\centering \textbf{I certify that this submission is my original work and meets the Faculty's Expectations of Originality.} 
+	\vspace{0.5in}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.65\textwidth,scale=1.1]{ENCS.jpg} % Include the image placeholder.png
+	\end{figure}
+	\thispagestyle{empty}
+	\begin{tikzpicture}[overlay,remember picture]
+	\draw [line width=3pt,rounded corners=1pt,]
+	($ (current page.north west) + (1cm,-1cm) $)
+	rectangle
+	($ (current page.south east) + (-1cm,1cm) $);  
+	\end{tikzpicture}
+	\begin{tikzpicture}[overlay,remember picture]
+	\draw [line width=3pt,rounded corners=1pt,]
+	($ (current page.north west) + (1.2cm,-1.2cm) $)
+	rectangle
+	($ (current page.south east) + (-1.2cm,1.2cm) $);  
+	\end{tikzpicture}
+\end{titlepage}
+
+
+
+%----------------------------------------------------------------
+%	Questions go here
+%----------------------------------------------------------------
+
+\begin{enumerate}
+	
+	\item \textbf{Consider the execution of an addition instruction. Before the execution of this instruction both C and V flags are cleared. If the instruction uses the S suffix, then give two examples (one example of operands which results in setting c, one example of operands which results in setting v flag) of operands that can result in setting of C and V flags?}
+    \\
+    \\
+    Suppose we have the following assembly instruction.
+    \begin{center}
+        \texttt{ADDS Rd, Rs}
+    \end{center}
+    \begin{enumerate}
+        \item \textbf{Example where C bit is set.}
+        \\
+        If  \texttt{Rd = FFFF FFFF}  and  \texttt{Rs = 0000 0001}, then the result of this operation is as follows.
+        \begin{center}
+            \texttt{ADDS Rd, Rs}
+            \\
+            \texttt{Rd = 0000} \hspace{0.4cm} \texttt{Rs = 0001}
+            \\
+            \texttt{N = 0, Z = 1, C = 1, V = 0, Q = 0}
+        \end{center}
+        In this example, the carry bit is set because a carry occurred during the addition operation. When adding one to a 32-bit number that is full of ones, the result is a carry of the most significant bit. Thus, the C bit was set to 1 in this example.
+        
+        \item \textbf{Example where V bit is set.}
+        \\
+        If  \texttt{Rd = 7000}  and  \texttt{Rs = 1001},  then the result of this operation is as follows.
+        \begin{center}
+            \texttt{ADDS Rd, Rs}
+            \\
+            \texttt{Rd = 8001} \hspace{0.4cm}  \texttt{Rs = 1001} \\
+            \texttt{N = 1, Z = 0, C = 0, V = 1, Q = 0}
+        \end{center}
+        In this example, the overflow bit is set to one as an overflow occurred. Assuming signed numbers, when adding 7000 with 1001, the result is 8001. This would be correct, if we were dealing with unsigned integers. However, since it is signed, our result in Rd is thus a negative number which is incorrect. This error is caught when the overflow signal is set to 1. Therefore, the V bit was set to 1 in this example.
+    \end{enumerate}
+	\item \textbf{Consider the addition instruction with flexible second operand Operand2, given below.}
+	\begin{center}
+	\texttt{ADD Rd, Rn, Rm, LSL \#n} 
+	\\ \vspace{0.4cm}
+	\textbf{It is desired to modify this instruction to the following new syntax.} \newline \newline
+	\texttt{ADD Rd, Rm, LSL \#n, Rn} 
+	\end{center}
+	\textbf{This new syntax can be called addition instruction with flexible first operand Operand1. What minimum change in the hardware architecture is required for the implementation of this instruction? (Draw your hardware modifications)}
+    \\
+    \\
+	As per the course slides, we know there is a barrel shifter between the register bank and the ALU within the processor. This barrel shifter allows a user to execute instructions such as ADD Rd, Rn, Rm, LSL \#n. The current hardware architecture for an instruction like this would look like the following diagram.
+	\begin{center}
+	    \includegraphics[scale=0.6]{ENCS_Assignment_Template/ALU_regs.png}
+	\end{center}
+	These different fields for registers in the encoding define the hardware of our processor as well. For instance, Rs and Rd correspond to specific register buses, as seen in the image above. For the first instruction presented (ADD Rd, Rn, Rm, LSL \#n), the hardware above is correct and the barrel shifter would have allowed for the LSL \#n. However, if we wanted to modify the language's syntax to be able to execute instructions such as ADD Rd, Rm, LSL \#n, Rn, the architecture of the processor would have to change. The order of the two operands would have to swtich, in order to allow the second to last field of "ADD" to have a LSL. The diagram below depicts the hardware change that must occur. 
+	\begin{center}
+	    \includegraphics[scale=0.4]{ENCS_Assignment_Template/ALU_regs1.png}
+	\end{center} 
+
+	Thus, the minimum hardware architecture change for the change in syntax here is to \textbf{swap the operand busses going to the ALU}. By switching the operand order going to the ALU, we could allow the second-to-last passed operand to be shifted by a barrel shifter.
+	\\
+	\newpage
+	\item \textbf{Write the equivalent assembly instructions for each of the following C instructions. Assume x is R1 register, y is R2, z is R3.}
+    \\
+    \begin{enumerate}
+        \item  \texttt{y = y + x *32;} 
+        \\ \\
+        \texttt{
+            LSL R1, R1, \#5 \\ 
+            ADD R2, R2, R1
+        }
+        
+        \item \texttt{z = y + x*x;}
+        \\ \\
+        \texttt{
+            MLA R3, R1, R1, R2 \\
+        }
+    \end{enumerate}
+	
+
+	\item \textbf{Assume you want to design the instruction fields for a simple processor. This simple processor has only 128 simple instructions. The register bank is made of 32-8 bit registers. How would you design the instruction fields for the following cases}
+	\\ \\
+	Given: 128 instructions, 32 (8-bit) registers. \\
+	From this information, we can deduce the amount bits needed for op-codes and register addressing. \\ \\
+	If we have 128 instructions, then we know there are $2^n = 128$ bits dedicated for the op-code. Thus, $n = \frac{\ln(128)}{\ln(2)}= \textbf{7 bits for op-code}$. \\ \\ 
+	We also know that \\ 
+	\hspace{1cm} $Instruction\ Field\ = OpCode\ Field\ +Immediate\ Field\ + Register\ Fields$ (1)
+	\begin{enumerate}
+	    \item \textbf{The instruction field is 16 bits fixed and its made of Rds (one register for both source and destination), Rs,  immediate and opcode fields and only the first 9 registers can be used as Rs and 
+        Rds in the instruction (what would be the range of bits for each fields?)} \\ \\
+        With an instruction field of 16 bits, and two registers (Rs and Rds), we thus have $2^n = 16$ bits dedicated for the register addressing. Thus, $n = \frac{\ln(16)}{\ln(2)}= \textbf{4 bits for register addressing}$. \\
+        Therefore, using eq. (1), \\ \\
+        $Immediate\ Field\ = Instruction\ Field\ - OpCode\ Field\ - Register\ Fields $ \\
+        $Immediate\ Field\ = 16 - 7 - (4 + 4) = \textbf{1 bit} $\\ \\
+        Thus, Opcode field would be bits 16-9, Rds field would be bits 9-5, Rs field would be bits 5-1, and the \textbf{immediate field would be bit 1}. \\ 
+        
+        \item \textbf{The instruction field is 32 bits fixed and it is made of Rd, Rs1 and Rs2 (separate registers for source and destination), immediate and opcode fields (what would be the range of bits for each fields?)} \\ \\
+        With an instruction field of 32 bits, and three registers (Rd, Rs1, and Rs2), we thus have $2^n = 32$ bits dedicated for the register addressing. Thus, $n = \frac{\ln(32)}{\ln(2)}= \textbf{5 bits for register addressing}$. \\
+        Therefore, using eq. (1), \\ \\
+        $Immediate\ Field\ = Instruction\ Field\ - OpCode\ Field\ - Register\ Fields $ \\
+        $Immediate\ Field\ = 32 - 7 - (5+5+5) = \textbf{10 bits} $\\ \\
+        Thus, Opcode field would be bits 32-25, Rd field would be bits 25-20, Rs1 field would be bits 20-15, Rs2 field would be bits 15-10, and the \textbf{immediate field would be bits 10-1}. \\ 
+        \newpage
+        
+       \item \textbf{The instruction field is 32 bits fixed and it is made of Rds, Rs and (one register for source and destination), immediate and opcode fields (what would be the range of bits for each fields?)} \\ \\
+        With an instruction field of 32 bits, and two registers (Rs and Rds), we thus have $2^n = 32$ bits dedicated for the register addressing. Thus, $n = \frac{\ln(32)}{\ln(2)}= \textbf{5 bits for register addressing}$. \\
+        Therefore, using eq. (1), \\ \\
+        $Immediate\ Field\ = Instruction\ Field\ - OpCode\ Field\ - Register\ Fields $ \\
+        $Immediate\ Field\ = 32 - 7 - (5+5) = \textbf{15 bits} $\\ \\
+        Thus, Opcode field would be bits 32-25, Rd field would be bits 25-20, Rs1 field would be bits 20-15, and the \textbf{immediate field would be bits 15-1}. \\ 
+        
+	\end{enumerate}
+	
+	\item \textbf{Assume the content of the registers are as follows before any instruction execution:}
+	\begin{enumerate}
+	    \item R1 = C3AB H
+	    \item R2 = A0B2 H
+	    \item R3 = 1108 H
+	\end{enumerate}
+	\textbf{Also assume the flags are: N=0,  Z= 1, C= 1, V=0, Q=0}
+	\\
+	\\
+	\textbf{Indicate the content of each register and flag after each instruction execution bellow:}
+	\begin{enumerate}
+	    \item ADD R1, R2
+	    \begin{center}
+          \begin{tabular}{ | c | c | c | c | c | c | c | c | }
+            \hline
+            R1 & R2 & R3 & N & Z & C & V & Q \\ \hline
+            645D & A0B2 & 1108 & 0 & 1 & 1 & 0 & 0 \\ \hline
+          \end{tabular}
+        \end{center}
+        \vspace{0.2cm}
+        \item ADD R3, R1, R2
+	    \begin{center}
+          \begin{tabular}{ | c | c | c | c | c | c | c | c | }
+            \hline
+            R1 & R2 & R3 & N & Z & C & V & Q \\ \hline
+            C3AB & A0B2 & 645D & 0 & 1 & 1 & 0 & 0 \\ \hline
+          \end{tabular}
+        \end{center}
+	    \vspace{0.2cm}
+	\item ADDS R1, R2
+	    \begin{center}
+          \begin{tabular}{ | c | c | c | c | c | c | c | c | }
+            \hline
+            R1 & R2 & R3 & N & Z & C & V & Q \\ \hline
+            645D & A0B2 & 1108 & 0 & 0 & 1 & 1 & 0 \\ \hline
+          \end{tabular}
+        \end{center}
+        \vspace{0.2cm}
+        \item ADDS R3, R1, R2
+	    \begin{center}
+          \begin{tabular}{ | c | c | c | c | c | c | c | c | }
+            \hline
+            R1 & R2 & R3 & N & Z & C & V & Q \\ \hline
+            C3AB & A0B2 & 645D & 0 & 0 & 1 & 1 & 0 \\ \hline
+          \end{tabular}
+        \end{center}
+        \vspace{0.2cm}
+        \item ADCS R3, R1, R2
+	    \begin{center}
+          \begin{tabular}{ | c | c | c | c | c | c | c | c | }
+            \hline
+            R1 & R2 & R3 & N & Z & C & V & Q \\ \hline
+            C3AB & A0B2 & 645E & 0 & 0 & 1 & 1 & 0 \\ \hline
+          \end{tabular}
+        \end{center}
+        \vspace{0.2cm}
+        \item ADDNE R1, R2
+	    \begin{center}
+          \begin{tabular}{ | c | c | c | c | c | c | c | c | }
+            \hline
+            R1 & R2 & R3 & N & Z & C & V & Q \\ \hline
+            C3AB & A0B2 & 1108 & 0 & 1 & 1 & 0 & 0 \\ \hline
+          \end{tabular}
+        \end{center}
+    \end{enumerate}
+\end{enumerate}
+
+
+\end{document}
+
